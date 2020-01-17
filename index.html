@@ -1,0 +1,32 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Project</title>
+    <script src="node_modules\animejs\lib\anime.min.js"></script>
+    <style>
+        .square
+        {
+            background-color: red;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="square"></div>
+
+
+
+    <script>
+        anime({
+            targets: 'div',
+            translateX: 250,
+            rotate: '1turn',
+            backgroundColor: '#FFF',
+            duration: 8000
+        });
+    </script>
+</body>
+</html>
