@@ -14,19 +14,54 @@
 </head>
 <body>
 
-
-    <div class="square"></div>
+    <button onclick="moveUp()">Up</button>
+    <button onclick="moveDown()">Down</button>
+    <button onclick="moveRight()">Right</button>
+    <button onclick="moveLeft()">Left</button>
+    <div class="square mainSquare"></div>
 
 
 
     <script>
-        anime({
-            targets: 'div',
-            translateX: 250,
-            rotate: '1turn',
-            backgroundColor: '#FFF',
-            duration: 8000
-        });
+        var squareTranslateX = 0;
+        var squareTranslateY = 0;
+
+        function moveDown()
+        {
+            squareTranslateY += 100;
+            anime({
+                targets: '.mainSquare',
+                translateY: squareTranslateY,
+                duration: 800
+            });
+        }
+        function moveUp()
+        {
+            squareTranslateY -= 100;
+            anime({
+                targets: '.mainSquare',
+                translateY: squareTranslateY,
+                duration: 800
+            });
+        }
+        function moveRight()
+        {
+            squareTranslateX += 100;
+            anime({
+                targets: '.mainSquare',
+                translateX: squareTranslateX,
+                duration: 800
+            });
+        }
+        function moveLeft()
+        {
+            squareTranslateX -= 100;
+            anime({
+                targets: '.mainSquare',
+                translateX: squareTranslateX,
+                duration: 800
+            });
+        }
     </script>
 </body>
 </html>
