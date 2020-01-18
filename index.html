@@ -10,7 +10,7 @@
             width: 100px;
             height: 100px;
         }
-        .mainSquare
+        #mainActor
         {
             position: absolute;
             left: 0px;
@@ -32,8 +32,9 @@
     <button onclick="moveDown()">Down</button>
     <button onclick="moveRight()">Right</button>
     <button onclick="moveLeft()">Left</button>
+    <button onclick="setMainActorPosition()">Set</button>
     <div class="gameField">
-        <div class="square mainSquare"></div>
+        <div class="square" id="mainActor"></div>
     </div>
     
 
@@ -48,9 +49,21 @@
 
         function positionElement(id, x, y)
         {
-            //document.getElementById(id).style.position
+            anime({
+                targets: '#'+id,
+                translateX: 100*actorPositionX,
+                translateY: 100*actorPositionY,
+                duration: 800
+            });
         }
 
+        function setMainActorPosition()
+        {
+            actorPositionX = Math.floor(Math.random()*x);
+            actorPositionY = Math.floor(Math.random()*y);
+            positionElement("mainActor", actorPositionX, actorPositionY);
+            //alert(actorPositionX+" "+actorPositionY);
+        }
         
 
         function moveDown()
@@ -59,7 +72,7 @@
             {
                 actorPositionY++;
                 anime({
-                    targets: '.mainSquare',
+                    targets: '#mainActor',
                     translateY: 100*actorPositionY,
                     duration: 800
                 });
@@ -71,7 +84,7 @@
             {
                 actorPositionY--;
                 anime({
-                    targets: '.mainSquare',
+                    targets: '#mainActor',
                     translateY: 100*actorPositionY,
                     duration: 800
                 });
@@ -83,7 +96,7 @@
             {
                 actorPositionX++;
                 anime({
-                    targets: '.mainSquare',
+                    targets: '#mainActor',
                     translateX: 100*actorPositionX,
                     duration: 800
                 });
@@ -95,7 +108,7 @@
             {
                 actorPositionX--;
                 anime({
-                    targets: '.mainSquare',
+                    targets: '#mainActor',
                     translateX: 100*actorPositionX,
                     duration: 800
                 });
