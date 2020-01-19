@@ -16,6 +16,9 @@
         .obstacle
         {
             background-color: black;
+            position: absolute;
+            left: 0px;
+            top: 0px;
         }
         #mainActor
         {
@@ -24,13 +27,13 @@
             left: 0px;
             top: 0px;
         }
-        .gameField
+        #gameField
         {
             position: relative;
             border-style: solid;
             border-width: 10px;
-            width: 800px;
-            height: 600px;
+            width: 700px;
+            height: 500px;
         }
     </style>
 </head>
@@ -41,7 +44,7 @@
     <button onclick="moveRight()">Right</button>
     <button onclick="moveLeft()">Left</button>
     <button onclick="setMainActorPosition()">Set</button>
-    <div class="gameField">
+    <div id="gameField">
         <div class="square circle" id="mainActor"></div>
     </div>
     
@@ -50,11 +53,12 @@
 
     <script>
 
-        function addElement(parentId, elementTag, elementId, html) 
+        function addElement(parentId, elementTag, elementId, elementClass, html) 
         {
             var p = document.getElementById(parentId);
             var newElement = document.createElement(elementTag);
             newElement.setAttribute('id', elementId);
+            newElement.setAttribute('class', elementClass);
             newElement.innerHTML = html;
             p.appendChild(newElement);
         }
@@ -62,6 +66,20 @@
         {
             var element = document.getElementById(elementId);
             element.parentNode.removeChild(element);
+        }
+        function findInMap(name)
+        {
+            for(var i=0; i<map.length; i++)
+            {
+                for(j=0; j<map[0].length; j++)
+                {
+                    if(map[i][j] == name)
+                    {
+                        var position = [i, j];
+                        return position;
+                    }
+                }
+            }
         }
 
         class ControllableElement
@@ -101,63 +119,106 @@
         var maxY = 5;
         var maxX = 7;
 
+        var map = [
+            ['b', 'b', 'b', 'b', 'b', 'b', 'b'],
+            ['b', 'b', 'b', 'b', 'b', 'b', 'b'],
+            ['b', 'b', 'b', 'b', 'b', 'b', 'b'],
+            ['b', 'b', 'b', 'b', 'b', 'b', 'b'],
+            ['b', 'b', 'b', 'b', 'b', 'b', 'b'],
+        ];
+
         function setMainActorPosition() //test
         {
-            var x = Math.floor(Math.random()*maxX);
-            var y = Math.floor(Math.random()*maxY);
+            do
+            {
+                var x = Math.floor(Math.random()*map[0].length);
+                var y = Math.floor(Math.random()*map.length);
+            } while(map[y][x] != 'b');
+            map[y][x] = 'MC';
             mainActor.setPosition(x, y);
             mainActor.positionElement();
         }
+        function createObstacles(amount = 5)
+        {
+            for(var i=0; i<amount; i++)
+            {
+                do
+                {
+                    var x = Math.floor(Math.random()*map[0].length);
+                    var y = Math.floor(Math.random()*map.length);
+                } while(map[y][x] != 'b');
+                map[y][x] = 'O';
+                addElement("gameField", "div" ,"obstacle"+(i+1), "square obstacle", "");
+                document.getElementById("obstacle"+(i+1)).style.left = x*100;
+                document.getElementById("obstacle"+(i+1)).style.top = y*100;
+            }
+        }
 
+        createObstacles(10); //test
         setMainActorPosition(); //test
-        
 
         function moveDown()
         {
             if(mainActor.y < maxY)
             {
-                mainActor.y++;
-                anime({
-                    targets: '#'+mainActor.id,
-                    translateY: 100*mainActor.y,
-                    duration: 800
-                });
+                if(map[mainActor.y + 1][mainActor.x] != 'O')
+                {
+                    mainActor.y++;
+                    anime({
+                        targets: '#'+mainActor.id,
+                        translateY: 100*mainActor.y,
+                        duration: 800
+                    });
+                    document.getElementById("mainActor").innerHTML = mainActor.x+" "+mainActor.y;
+                }
             }
         }
         function moveUp()
         {
             if(mainActor.y > 0)
             {
-                mainActor.y--;
-                anime({
-                    targets: '#'+mainActor.id,
-                    translateY: 100*mainActor.y,
-                    duration: 800
-                });
+                if(map[mainActor.y - 1][mainActor.x] != 'O')
+                {
+                    mainActor.y--;
+                    anime({
+                        targets: '#'+mainActor.id,
+                        translateY: 100*mainActor.y,
+                        duration: 800
+                    });
+                    document.getElementById("mainActor").innerHTML = mainActor.x+" "+mainActor.y;
+                }
             }
         }
         function moveRight()
         {
             if(mainActor.x < maxX)
             {
-                mainActor.x++;
-                anime({
-                    targets: '#'+mainActor.id,
-                    translateX: 100*mainActor.x,
-                    duration: 800
-                });
+                if(map[mainActor.y][mainActor.x + 1] != 'O')
+                {
+                    mainActor.x++;
+                    anime({
+                        targets: '#'+mainActor.id,
+                        translateX: 100*mainActor.x,
+                        duration: 800
+                    });
+                    document.getElementById("mainActor").innerHTML = mainActor.x+" "+mainActor.y;
+                }
             }
         }
         function moveLeft()
         {
             if(mainActor.x > 0)
             {
-                mainActor.x--;
-                anime({
-                    targets: '#'+mainActor.id,
-                    translateX: 100*mainActor.x,
-                    duration: 800
-                });
+                if(map[mainActor.y][mainActor.x - 1] != 'O')
+                {
+                    mainActor.x--;
+                    anime({
+                        targets: '#'+mainActor.id,
+                        translateX: 100*mainActor.x,
+                        duration: 800
+                    });
+                    document.getElementById("mainActor").innerHTML = mainActor.x+" "+mainActor.y;
+                }
             }
         }
     </script>
