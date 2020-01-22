@@ -27,6 +27,13 @@
             left: 0;
             top: 0;
         }
+        #goal
+        {
+            background-color: green;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
         #gameField
         {
             position: relative;
@@ -41,12 +48,13 @@
     <input type="text" id="y" value="5">Wysokość planszy<br>
     <input type="text" id="x" value="7">Szerokość planszy<br>
     <button onclick="generate()">Generuj ponownie</button><br>
-    <button onclick="mainActor.moveUp(map)">Up</button>
-    <button onclick="mainActor.moveDown(map)">Down</button>
-    <button onclick="mainActor.moveRight(map)">Right</button>
-    <button onclick="mainActor.moveLeft(map)">Left</button>
+    <button onclick="mainActor.move(0, -1)">Up</button>
+    <button onclick="mainActor.move(0, 1)">Down</button>
+    <button onclick="mainActor.move(1, 0)">Right</button>
+    <button onclick="mainActor.move(-1, 0)">Left</button>
+    <button onclick="showMap()">Show map</button>
     <div id="gameField">
-        <div class="square circle" id="mainActor"></div>
+        
     </div>
     
 
@@ -75,7 +83,8 @@
         function removeElement(elementId) 
         {
             var element = document.getElementById(elementId);
-            element.parentNode.removeChild(element);
+            if(element != null)
+                element.parentNode.removeChild(element);
         }
 
         function findInMap(name)
@@ -134,78 +143,84 @@
                 document.getElementById(this.id).style.top = cellSize*this.y;
             }
 
-            moveDown(map)
+            move(x, y)
             {
-                if(this.y + 1 < map.length)
+                if( (this.y + y >= 0 && this.y + y < map.length) && (this.x + x >= 0 && this.x + x < map[0].length) )
                 {
-                    if(map[this.y + 1][this.x] != 'O')
+                    if(map[this.y + y][this.x + x] == "b" || map[this.y + y][this.x + x] == "G")
                     {
-                        this.y++;
-                        anime({
-                            targets: '#'+this.id,
-                            translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
-                            duration: 800
-                        });
-                        document.getElementById(this.id).innerHTML = this.x+" "+this.y;
+                        map[this.y][this.x] = "b";
+
+                        if(y == 1)
+                            this.moveDown();
+                        else if(y == -1)
+                            this.moveUp();
+                
+                        if(x == -1)
+                            this.moveLeft();
+                        else if(x == 1)
+                            this.moveRight();
+                        
+                        this.checkWinConditions();
+                        map[this.y][this.x] = "MC";
                     }
                 }
             }
-            moveUp(map)
+
+            moveDown()
             {
-                if(this.y > 0)
-                {
-                    if(map[this.y - 1][this.x] != 'O')
-                    {
-                        this.y--;
-                        anime({
-                            targets: '#'+this.id,
-                            translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
-                            duration: 800
-                        });
-                        document.getElementById(this.id).innerHTML = this.x+" "+this.y;
-                    }
-                }
+                this.y++;
+                anime({
+                    targets: '#'+this.id,
+                    translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
+                    duration: 800
+                });
+                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
             }
-            moveRight(map)
+            moveUp()
             {
-                if(this.x + 1 < map[0].length)
-                {
-                    if(map[this.y][this.x + 1] != 'O')
-                    {
-                        this.x++;
-                        anime({
-                            targets: '#'+this.id,
-                            translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
-                            duration: 800
-                        });
-                        document.getElementById(this.id).innerHTML = this.x+" "+this.y;
-                    }
-                }
+                this.y--;
+                anime({
+                    targets: '#'+this.id,
+                    translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
+                    duration: 800
+                });
+                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
             }
-            moveLeft(map)
+            moveRight()
             {
-                if(this.x > 0)
+                this.x++;
+                anime({
+                    targets: '#'+this.id,
+                    translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
+                    duration: 800
+                });
+                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
+            }
+            moveLeft()
+            {
+                this.x--;
+                anime({
+                    targets: '#'+this.id,
+                    translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
+                    duration: 800
+                });
+                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
+            }
+
+            checkWinConditions()
+            {
+                if(map[this.y][this.x] == "G")
                 {
-                    if(map[this.y][this.x - 1] != 'O')
-                    {
-                        this.x--;
-                        anime({
-                            targets: '#'+this.id,
-                            translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
-                            duration: 800
-                        });
-                        document.getElementById(this.id).innerHTML = this.x+" "+this.y;
-                    }
+                    alert("You've won!");
                 }
             }
         }
 
-        var mainActor = new ControllableElement("mainActor", "yellow");
+        var mainActor;
 
         function generate()
         {
-            removeElements("obstacle");
-
             if(!isNaN(document.getElementById("y").value) && !isNaN(document.getElementById("x").value))
             {
                 var x = parseInt(document.getElementById("x").value);
@@ -228,16 +243,9 @@
                 document.getElementById("gameField").style.width = x*cellSize;
                 document.getElementById("gameField").style.height = y*cellSize;
 
-                setMainActorPosition();
+                setGoal();
+                setMainActor();
                 createObstacles(4);
-
-                var mapa="";
-                for(var i=0; i<map.length; i++)
-                {
-                    for(var j=0; j<map[0].length; j++)
-                        mapa += map[i][j]+" ";
-                    mapa += "\n";
-                }
                 
                 var all = document.getElementsByClassName('square');
                 for (var i = 0; i < all.length; i++) 
@@ -248,8 +256,41 @@
             }
         }
         
-        function setMainActorPosition() //test
+        
+        function setGoal()
         {
+            removeElement("goal");
+            do
+                {
+                    var x = Math.floor(Math.random()*map[0].length);
+                    var y = Math.floor(Math.random()*map.length);
+                } while(map[y][x] != 'b');
+                map[y][x] = 'G';
+                addElement("gameField", "div" , "goal", "square", "");
+                document.getElementById("goal").style.left = x*cellSize;
+                document.getElementById("goal").style.top = y*cellSize;
+        }
+        function createObstacles(amount = 5)
+        {
+            removeElements("obstacle");
+            for(var i=0; i<amount; i++)
+            {
+                do
+                {
+                    var x = Math.floor(Math.random()*map[0].length);
+                    var y = Math.floor(Math.random()*map.length);
+                } while(map[y][x] != 'b');
+                map[y][x] = 'O'+(i+1);
+                addElement("gameField", "div" ,"O"+(i+1), "square obstacle", "");
+                document.getElementById("O"+(i+1)).style.left = x*cellSize;
+                document.getElementById("O"+(i+1)).style.top = y*cellSize;
+            }
+        }
+        function setMainActor()
+        {
+            removeElement("mainActor");
+            addElement("gameField", "div" , "mainActor", "square circle", "");
+            mainActor = new ControllableElement("mainActor", "yellow");
             do
             {
                 var x = Math.floor(Math.random()*map[0].length);
@@ -260,20 +301,17 @@
             mainActor.positionElement();
             document.getElementById(mainActor.id).innerHTML = mainActor.x+" "+mainActor.y;
         }
-        function createObstacles(amount = 5)
+
+        function showMap()
         {
-            for(var i=0; i<amount; i++)
+            var mapa="";
+            for(var i=0; i<map.length; i++)
             {
-                do
-                {
-                    var x = Math.floor(Math.random()*map[0].length);
-                    var y = Math.floor(Math.random()*map.length);
-                } while(map[y][x] != 'b');
-                map[y][x] = 'O';
-                addElement("gameField", "div" ,"obstacle"+(i+1), "square obstacle", "");
-                document.getElementById("obstacle"+(i+1)).style.left = x*cellSize;
-                document.getElementById("obstacle"+(i+1)).style.top = y*cellSize;
+                for(var j=0; j<map[0].length; j++)
+                    mapa += map[i][j]+" ";
+                mapa += "\n";
             }
+            alert(mapa);
         }
 
         generate();
