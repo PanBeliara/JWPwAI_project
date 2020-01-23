@@ -48,10 +48,10 @@
     <input type="text" id="y" value="5">Wysokość planszy<br>
     <input type="text" id="x" value="7">Szerokość planszy<br>
     <button onclick="generate()">Generuj ponownie</button><br>
-    <button onclick="mainActor.move(0, -1)">Up</button>
-    <button onclick="mainActor.move(0, 1)">Down</button>
-    <button onclick="mainActor.move(1, 0)">Right</button>
-    <button onclick="mainActor.move(-1, 0)">Left</button>
+    <button onclick="mainActor.move('up')">Up</button>
+    <button onclick="mainActor.move('down')">Down</button>
+    <button onclick="mainActor.move('left')">Left</button>
+    <button onclick="mainActor.move('right')">Right</button>
     <button onclick="showMap()">Show map</button>
     <div id="gameField">
         
@@ -143,8 +143,20 @@
                 document.getElementById(this.id).style.top = cellSize*this.y;
             }
 
-            move(x, y)
+            move(side)
             {
+                x = 0;
+                y = 0;
+
+                if(side === "right")
+                    x = 1;
+                else if(side === "left")
+                    x = -1;
+                else if(side === "down")
+                    y = 1;
+                else if(side === "up")
+                    y = -1;
+
                 if( (this.y + y >= 0 && this.y + y < map.length) && (this.x + x >= 0 && this.x + x < map[0].length) )
                 {
                     if(map[this.y + y][this.x + x] == "b" || map[this.y + y][this.x + x] == "G")
