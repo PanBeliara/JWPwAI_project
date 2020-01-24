@@ -38,7 +38,7 @@
         {
             position: relative;
             border-style: solid;
-            border-width: 10px;
+            border-width: 20px;
             width: 700px;
             height: 500px;
         }
@@ -67,6 +67,7 @@
             fields;
             parentElementId;
             mainActor;
+            animatedObject;
 
             constructor(x, y, parentElement)
             {
@@ -125,6 +126,7 @@
                 this.mainActor.setPosition(x, y);
                 this.mainActor.positionElement();
                 document.getElementById(this.mainActor.id).innerHTML = this.mainActor.x+" "+this.mainActor.y;
+                this.mainActor.elementOf = this;
             }
             showMap()
             {
@@ -155,10 +157,11 @@
         class ControllableElement
         {
             id;
+            elementOf;
             color;
             y;
             x;
-            animation;
+            animation = anime();
 
             constructor(id, color)
             {
@@ -215,6 +218,25 @@
                         this.checkWinConditions();
                         map.fields[this.y][this.x] = "MC";
                     }
+                    else
+                    {
+                        this.elementOf.animatedObject = anime({
+                            targets: '#'+map.fields[this.y + y][this.x + x],
+                            translateY: (cellSize*y)/4,
+                            translateX: (cellSize*x)/4,
+                            easing: 'easeInOutSine',
+                            direction: 'alternate',
+                            duration: 60
+                        });
+                        this.animation = anime({
+                            targets: '#'+this.id,
+                            translateY: ((cellSize*this.y) - parseInt(document.getElementById(this.id).style.top) + (cellSize*y)/4),
+                            translateX: ((cellSize*this.x) - parseInt(document.getElementById(this.id).style.left) + (cellSize*x)/4),
+                            easing: 'easeInOutSine',
+                            direction: 'alternate',
+                            duration: 60
+                        })
+                    }
                 }
             }
 
@@ -224,6 +246,7 @@
                 this.animation = anime({
                     targets: '#'+this.id,
                     translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
+                    easing: 'easeInOutSine',
                     duration: 800
                 });
                 document.getElementById(this.id).innerHTML = this.x+" "+this.y;
@@ -234,6 +257,7 @@
                 this.animation = anime({
                     targets: '#'+this.id,
                     translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
+                    easing: 'easeInOutSine',
                     duration: 800
                 });
                 document.getElementById(this.id).innerHTML = this.x+" "+this.y;
@@ -244,6 +268,7 @@
                 this.animation = anime({
                     targets: '#'+this.id,
                     translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
+                    easing: 'easeInOutSine',
                     duration: 800
                 });
                 document.getElementById(this.id).innerHTML = this.x+" "+this.y;
@@ -254,6 +279,7 @@
                 this.animation = anime({
                     targets: '#'+this.id,
                     translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
+                    easing: 'easeInOutSine',
                     duration: 800
                 });
                 document.getElementById(this.id).innerHTML = this.x+" "+this.y;
