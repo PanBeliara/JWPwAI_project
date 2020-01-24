@@ -45,8 +45,8 @@
     </style>
 </head>
 <body>
-    <input type="text" id="y" value="5">Wysokość planszy<br>
-    <input type="text" id="x" value="7">Szerokość planszy<br>
+    <input type="text" id="y" placeholder="50 max">Wysokość planszy<br>
+    <input type="text" id="x" placeholder="80 max">Szerokość planszy<br>
     <button onclick="generate()">Generuj ponownie</button><br>
     <button onclick="map.mainActor.move('up')">Up</button>
     <button onclick="map.mainActor.move('down')">Down</button>
@@ -274,32 +274,38 @@
 
         function generate()
         {
-            if(!isNaN(document.getElementById("y").value) && !isNaN(document.getElementById("x").value))
+            if(isNaN(document.getElementById("y").value) || isNaN(document.getElementById("x").value))
+            {
+                var x = 3;
+                var y = 3;
+            }
+            else
             {
                 var x = parseInt(document.getElementById("x").value);
                 var y = parseInt(document.getElementById("y").value);
 
-                if(x < 3 || x > 30)
+                if(x < 3 || x > 80)
                     x = 3;
-                if(y < 3 || y > 30)
+                if(y < 3 || y > 50)
                     y = 3;
-
-                map = new GameMap(x, y, "gameField");
-                
-                document.getElementById("gameField").style.width = x*cellSize;
-                document.getElementById("gameField").style.height = y*cellSize;
-
-                map.setGoal();
-                map.setMainActor();
-                map.createObstacles(4);
-                
-                var all = document.getElementsByClassName('square');
-                for (var i = 0; i < all.length; i++) 
-                {
-                    all[i].style.width = cellSize;
-                    all[i].style.height = cellSize;
-                }
             }
+                
+            map = new GameMap(x, y, "gameField");
+            
+            document.getElementById("gameField").style.width = x*cellSize;
+            document.getElementById("gameField").style.height = y*cellSize;
+
+            map.setGoal();
+            map.setMainActor();
+            map.createObstacles(4);
+            
+            var all = document.getElementsByClassName('square');
+            for (var i = 0; i < all.length; i++) 
+            {
+                all[i].style.width = cellSize;
+                all[i].style.height = cellSize;
+            }
+            
         }
         function addElement(parentId, elementTag, elementId, elementClass, html) 
         {
