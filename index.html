@@ -47,7 +47,7 @@
 <body>
     <input type="text" id="y" placeholder="50 max">Wysokość planszy<br>
     <input type="text" id="x" placeholder="80 max">Szerokość planszy<br>
-    <button onclick="generate()">Generuj ponownie</button><br>
+    <button onclick="generateAgain()">Generuj ponownie</button><br>
     <button onclick="map.mainActor.move('up')">Up</button>
     <button onclick="map.mainActor.move('down')">Down</button>
     <button onclick="map.mainActor.move('left')">Left</button>
@@ -158,6 +158,7 @@
             color;
             y;
             x;
+            animation;
 
             constructor(id, color)
             {
@@ -220,7 +221,7 @@
             moveDown()
             {
                 this.y++;
-                anime({
+                this.animation = anime({
                     targets: '#'+this.id,
                     translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
                     duration: 800
@@ -230,7 +231,7 @@
             moveUp()
             {
                 this.y--;
-                anime({
+                this.animation = anime({
                     targets: '#'+this.id,
                     translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
                     duration: 800
@@ -240,7 +241,7 @@
             moveRight()
             {
                 this.x++;
-                anime({
+                this.animation = anime({
                     targets: '#'+this.id,
                     translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
                     duration: 800
@@ -250,7 +251,7 @@
             moveLeft()
             {
                 this.x--;
-                anime({
+                this.animation = anime({
                     targets: '#'+this.id,
                     translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
                     duration: 800
@@ -306,6 +307,11 @@
                 all[i].style.height = cellSize;
             }
             
+        }
+        function generateAgain()
+        {
+            map.mainActor.animation.pause();
+            generate();
         }
         function addElement(parentId, elementTag, elementId, elementClass, html) 
         {
