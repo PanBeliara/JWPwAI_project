@@ -39,13 +39,13 @@
             position: relative;
             border-style: solid;
             border-width: 20px;
-            width: 700px;
-            height: 500px;
+            width: 0px;
+            height: 0px;
         }
     </style>
 </head>
 <body>
-    <input type="text" id="y" placeholder="50 max">Wysokość planszy<br>
+    <input type="text" id="y" placeholder="40 max">Wysokość planszy<br>
     <input type="text" id="x" placeholder="80 max">Szerokość planszy<br>
     <button onclick="generateAgain()">Generuj ponownie</button><br>
     <button onclick="map.mainActor.move('up')">Up</button>
@@ -53,6 +53,7 @@
     <button onclick="map.mainActor.move('left')">Left</button>
     <button onclick="map.mainActor.move('right')">Right</button>
     <button onclick="map.showMap()">Show map</button>
+    <p id="test"></p>
     <div id="gameField">
         
     </div>
@@ -125,7 +126,7 @@
                 this.fields[y][x] = 'MC';
                 this.mainActor.setPosition(x, y);
                 this.mainActor.positionElement();
-                document.getElementById(this.mainActor.id).innerHTML = this.mainActor.x+" "+this.mainActor.y;
+                //document.getElementById(this.mainActor.id).innerHTML = this.mainActor.x+" "+this.mainActor.y; //for tests
                 this.mainActor.elementOf = this;
             }
             showMap()
@@ -162,6 +163,7 @@
             y;
             x;
             animation = anime();
+            isAnimationCompleted;
 
             constructor(id, color)
             {
@@ -205,84 +207,44 @@
                     {
                         map.fields[this.y][this.x] = "b";
 
-                        if(y == 1)
-                            this.moveDown();
-                        else if(y == -1)
-                            this.moveUp();
-                
-                        if(x == -1)
-                            this.moveLeft();
-                        else if(x == 1)
-                            this.moveRight();
+                        this.y += y;
+                        this.x += x
+
+                        this.animation = anime({
+                            targets: '#'+this.id,
+                            translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
+                            translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
+                            easing: 'linear',
+                            duration: 400
+                        });
+                        //document.getElementById(this.id).innerHTML = this.x+" "+this.y; //for tests
                         
                         this.checkWinConditions();
                         map.fields[this.y][this.x] = "MC";
                     }
                     else
                     {
-                        this.elementOf.animatedObject = anime({
-                            targets: '#'+map.fields[this.y + y][this.x + x],
-                            translateY: (cellSize*y)/4,
-                            translateX: (cellSize*x)/4,
-                            easing: 'easeInOutSine',
-                            direction: 'alternate',
-                            duration: 60
-                        });
-                        this.animation = anime({
-                            targets: '#'+this.id,
-                            translateY: ((cellSize*this.y) - parseInt(document.getElementById(this.id).style.top) + (cellSize*y)/4),
-                            translateX: ((cellSize*this.x) - parseInt(document.getElementById(this.id).style.left) + (cellSize*x)/4),
-                            easing: 'easeInOutSine',
-                            direction: 'alternate',
-                            duration: 60
-                        })
+                        if(this.animation.completed)
+                        {
+                            this.elementOf.animatedObject = anime({
+                                targets: '#'+map.fields[this.y + y][this.x + x],
+                                translateY: (cellSize*y)/4,
+                                translateX: (cellSize*x)/4,
+                                easing: 'linear',
+                                direction: 'alternate',
+                                duration: 60
+                            });
+                            this.animation = anime({
+                                targets: '#'+this.id,
+                                translateY: ((cellSize*this.y) - parseInt(document.getElementById(this.id).style.top) + (cellSize*y)/4),
+                                translateX: ((cellSize*this.x) - parseInt(document.getElementById(this.id).style.left) + (cellSize*x)/4),
+                                easing: 'linear',
+                                direction: 'alternate',
+                                duration: 60
+                            })
+                        }
                     }
                 }
-            }
-
-            moveDown()
-            {
-                this.y++;
-                this.animation = anime({
-                    targets: '#'+this.id,
-                    translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
-                    easing: 'easeInOutSine',
-                    duration: 800
-                });
-                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
-            }
-            moveUp()
-            {
-                this.y--;
-                this.animation = anime({
-                    targets: '#'+this.id,
-                    translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
-                    easing: 'easeInOutSine',
-                    duration: 800
-                });
-                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
-            }
-            moveRight()
-            {
-                this.x++;
-                this.animation = anime({
-                    targets: '#'+this.id,
-                    translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
-                    easing: 'easeInOutSine',
-                    duration: 800
-                });
-                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
-            }
-            moveLeft()
-            {
-                this.x--;
-                this.animation = anime({
-                    targets: '#'+this.id,
-                    translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
-                    easing: 'easeInOutSine',
-                    duration: 800
-                });
-                document.getElementById(this.id).innerHTML = this.x+" "+this.y;
             }
 
             checkWinConditions()
@@ -294,7 +256,7 @@
             }
         }
 
-        var cellSize = 50;
+        var cellSize = 20;
         var map;
         
         generate();
@@ -318,7 +280,7 @@
 
                 if(x < 3 || x > 80)
                     x = 3;
-                if(y < 3 || y > 50)
+                if(y < 3 || y > 40)
                     y = 3;
             }
                 
@@ -329,7 +291,7 @@
 
             map.setGoal();
             map.setMainActor();
-            map.createObstacles(4);
+            map.createObstacles((x*y)/4);
             
             var all = document.getElementsByClassName('square');
             for (var i = 0; i < all.length; i++) 
