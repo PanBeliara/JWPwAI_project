@@ -34,6 +34,14 @@
             left: 0;
             top: 0;
         }
+        #controls
+        {
+            visibility: visible;
+        }
+        #gameContainer
+        {
+            position: relative;
+        }
         #gameField
         {
             position: relative;
@@ -41,28 +49,48 @@
             border-width: 20px;
             width: 0px;
             height: 0px;
+            visibility: visible;
+            position: absolute;
+        }
+        #gameConclusion
+        {
+            visibility: hidden;
+            position: absolute;
+        }
+        .ml2 
+        {
+            font-weight: 900;
+            font-size: 3.5em;
+        }
+
+        .ml2 .letter 
+        {
+            display: inline-block;
+            line-height: 1em;
         }
     </style>
 </head>
 <body>
-    <input type="text" id="y" placeholder="40 max">Wysokość planszy<br>
-    <input type="text" id="x" placeholder="80 max">Szerokość planszy<br>
-    <button onclick="generateAgain()">Generuj ponownie</button><br>
-    <button onclick="map.mainActor.move('up')">Up</button>
-    <button onclick="map.mainActor.move('down')">Down</button>
-    <button onclick="map.mainActor.move('left')">Left</button>
-    <button onclick="map.mainActor.move('right')">Right</button>
-    <button onclick="map.showMap()">Show map</button>
-    <p id="test"></p>
-    <div id="gameField">
-        
+    <input type="text" id="y" placeholder="40 max">Board's height<br>
+    <input type="text" id="x" placeholder="80 max">Board's width<br>
+    <button onclick="generateAgain()">Generate again</button><br>
+    <div id="controls">
+        <button onclick="map.mainActor.move('up')">Up</button>
+        <button onclick="map.mainActor.move('down')">Down</button>
+        <button onclick="map.mainActor.move('left')">Left</button>
+        <button onclick="map.mainActor.move('right')">Right</button>
+        <button onclick="map.showMap()">Show map</button>
     </div>
-    
-
-
+    <div id="gameContainer">
+        <div id="gameField"></div>
+        <div id="gameConclusion">
+            <div id="lineDrawing"> 
+                <h1 class="ml2">Congratulations!</h1>
+            </div>
+        </div>
+    </div>
 
     <script>
-
         class GameMap
         {
             fields;
@@ -126,7 +154,6 @@
                 this.fields[y][x] = 'MC';
                 this.mainActor.setPosition(x, y);
                 this.mainActor.positionElement();
-                //document.getElementById(this.mainActor.id).innerHTML = this.mainActor.x+" "+this.mainActor.y; //for tests
                 this.mainActor.elementOf = this;
             }
             showMap()
@@ -163,7 +190,6 @@
             y;
             x;
             animation = anime();
-            isAnimationCompleted;
 
             constructor(id, color)
             {
@@ -210,16 +236,28 @@
                         this.y += y;
                         this.x += x
 
-                        this.animation = anime({
-                            targets: '#'+this.id,
-                            translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
-                            translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
-                            easing: 'linear',
-                            duration: 400
-                        });
-                        //document.getElementById(this.id).innerHTML = this.x+" "+this.y; //for tests
+                        if(this.checkWinConditions())
+                        {
+                            this.animation = anime({
+                                targets: '#'+this.id,
+                                translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
+                                translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
+                                easing: 'linear',
+                                duration: 400,
+                                complete: concludeGame
+                            });
+                        }
+                        else
+                        {
+                            this.animation = anime({
+                                targets: '#'+this.id,
+                                translateX: (cellSize*this.x - parseInt(document.getElementById(this.id).style.left)),
+                                translateY: (cellSize*this.y - parseInt(document.getElementById(this.id).style.top)),
+                                easing: 'linear',
+                                duration: 400
+                            });
+                        }
                         
-                        this.checkWinConditions();
                         map.fields[this.y][this.x] = "MC";
                     }
                     else
@@ -241,7 +279,7 @@
                                 easing: 'linear',
                                 direction: 'alternate',
                                 duration: 60
-                            })
+                            });
                         }
                     }
                 }
@@ -249,9 +287,9 @@
 
             checkWinConditions()
             {
-                if(map.fields[this.y][this.x] == "G")
+                if(this.elementOf.fields[this.y][this.x] == "G")
                 {
-                    alert("You've won!");
+                    return true;
                 }
             }
         }
@@ -263,6 +301,10 @@
 
         function generate()
         {
+            document.getElementById('gameConclusion').style.visibility = "hidden";
+            document.getElementById('gameField').style.visibility = "visible";
+            document.getElementById('controls').style.visibility = "visible";
+            
             if(isNaN(document.getElementById("y").value) || isNaN(document.getElementById("x").value))
             {
                 var x = 3;
@@ -306,6 +348,28 @@
             map.mainActor.animation.pause();
             generate();
         }
+        function concludeGame()
+        {
+            document.getElementById('controls').style.visibility = "hidden";
+            document.getElementById('gameField').style.visibility = "hidden";
+            document.getElementById('gameConclusion').style.visibility = "visible";
+            
+            var textWrapper = document.querySelector('.ml2');
+            textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+
+            anime.timeline({
+                loop: false,
+                autoplay: true
+            }).add({
+                targets: '.ml2 .letter',
+                scale: [4,1],
+                opacity: [0,1],
+                translateZ: 0,
+                easing: "easeOutExpo",
+                duration: 950,
+                delay: (el, i) => 70*i
+            });
+        }
         function addElement(parentId, elementTag, elementId, elementClass, html) 
         {
             var p = document.getElementById(parentId);
@@ -329,7 +393,6 @@
             if(element != null)
                 element.parentNode.removeChild(element);
         }
-        
     </script>
 </body>
 </html>
