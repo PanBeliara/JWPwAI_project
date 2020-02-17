@@ -1,5 +1,7 @@
 # JWPwAI_project
 
+Creator: Grzegorz Żuk
+
 Used frameworks:
 - anime.js
 
